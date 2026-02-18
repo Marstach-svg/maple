@@ -1,0 +1,15 @@
+[env.production]
+name = "maple-backend"
+main = "dist/index.js"
+compatibility_date = "2023-05-18"
+
+[env.production.vars]
+NODE_ENV = "production"
+
+[env.development]
+name = "maple-backend-dev"
+main = "dist/index.js"
+compatibility_date = "2023-05-18"
+
+[env.development.vars]
+NODE_ENV = "development"

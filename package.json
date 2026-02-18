@@ -1,0 +1,31 @@
+{
+  "name": "maple-travel-log",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Couple travel log application with map visualization",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:frontend": "npm run dev --workspace=apps/frontend",
+    "dev:backend": "npm run dev --workspace=apps/backend",
+    "build": "npm run build --workspace=apps/frontend && npm run build --workspace=apps/backend",
+    "type-check": "npm run type-check --workspace=apps/frontend && npm run type-check --workspace=apps/backend",
+    "lint": "npm run lint --workspace=apps/frontend && npm run lint --workspace=apps/backend",
+    "db:generate": "npx prisma generate",
+    "db:push": "npx prisma db push",
+    "db:migrate": "npx prisma migrate deploy",
+    "db:studio": "npx prisma studio"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "concurrently": "^8.2.2",
+    "typescript": "^5.0.0",
+    "prisma": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
