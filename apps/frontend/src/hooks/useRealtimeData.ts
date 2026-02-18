@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { usePolling } from './usePolling';
 import { api } from '@/lib/api';
 import type { Pin, PrefectureStats } from '@maple/shared';
@@ -58,6 +58,13 @@ export function useRealtimeData({ groupId, enabled = true }: UseRealtimeDataProp
     enabled: enabled && !!groupId,
     interval: 10000, // 10秒間隔でポーリング
   });
+  
+  // Initial data load when groupId or enabled changes
+  useEffect(() => {
+    if (enabled && groupId) {
+      loadData();
+    }
+  }, [groupId, enabled, loadData]);
   
   const forceRefresh = useCallback(() => {
     return loadData();

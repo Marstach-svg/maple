@@ -6,8 +6,11 @@ import { AuthProvider } from '@/hooks/useAuth';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Maple Travel Log',
-  description: 'カップル向け旅行ログアプリ',
+  title: 'Maple',
+  description: 'カップル向け旅行ログアプリ - 美しい地図で思い出を記録',
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({

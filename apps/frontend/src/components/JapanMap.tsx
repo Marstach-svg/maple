@@ -1,183 +1,245 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import * as d3 from 'd3';
-import { geoMercator, geoPath } from 'd3-geo';
-import japanData from '@/data/japan-simple.json';
+import maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
 import type { Pin, PrefectureStats } from '@maple/shared';
+import LocationSearch from './LocationSearch';
 
 interface JapanMapProps {
   pins: Pin[];
   prefectureStats: PrefectureStats[];
   onPinClick?: (pin: Pin) => void;
-  onMapClick?: (coordinates: [number, number], prefecture: string) => void;
+  onMapClick?: (coordinates: [number, number], prefecture: string, address?: string) => void;
 }
 
 export default function JapanMap({ pins, prefectureStats, onPinClick, onMapClick }: JapanMapProps) {
-  const svgRef = useRef<SVGSVGElement>(null);
-  const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<maplibregl.Map | null>(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
-  useEffect(() => {
-    const handleResize = () => {
-      const container = svgRef.current?.parentElement;
-      if (container) {
-        setDimensions({
-          width: container.clientWidth,
-          height: Math.min(container.clientWidth * 0.75, 600),
-        });
-      }
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  useEffect(() => {
-    if (!svgRef.current) return;
-    
-    console.log('JapanMap: Starting map render');
-    console.log('JapanMap: Pins data:', pins);
-    console.log('JapanMap: Prefecture stats:', prefectureStats);
-    console.log('JapanMap: Dimensions:', dimensions);
-    console.log('JapanMap: Rendering map...');
-
-    const svg = d3.select(svgRef.current);
-    svg.selectAll('*').remove();
-
-    const projection = geoMercator()
-      .center([138, 38])
-      .scale(dimensions.width * 1.2)
-      .translate([dimensions.width / 2, dimensions.height / 2]);
-
-    const path = geoPath().projection(projection);
-
-    const maxCount = Math.max(...prefectureStats.map(s => s.count), 1);
-    const colorScale = d3
-      .scaleLinear<string>()
-      .domain([0, maxCount])
-      .range(['#fce7f3', '#be185d']);
-
-    const g = svg.append('g');
-    
-    console.log('JapanMap: Japan data features:', japanData.features.length);
-
-    g.selectAll('path')
-      .data(japanData.features)
-      .enter()
-      .append('path')
-      .attr('d', path as any)
-      .attr('fill', (d) => {
-        const stat = prefectureStats.find(s => s.prefecture === d.properties.name);
-        const color = stat ? colorScale(stat.count) : '#e5e7eb';
-        console.log(`Prefecture ${d.properties.name}: color = ${color}`);
-        return color;
-      })
-      .attr('stroke', '#d1d5db')
-      .attr('stroke-width', 1)
-      .style('cursor', 'pointer')
-      .on('click', function(event, d) {
-        if (onMapClick) {
-          const [x, y] = d3.pointer(event, this);
-          const coordinates = projection.invert!([x, y]) as [number, number];
-          onMapClick(coordinates, d.properties.name);
+  // Reverse geocoding function to get place name from coordinates
+  const reverseGeocode = async (lng: number, lat: number) => {
+    try {
+      const response = await fetch(
+        `https://api.maptiler.com/geocoding/${lng},${lat}.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL&language=ja`
+      );
+      const data = await response.json();
+      
+      if (data.features && data.features.length > 0) {
+        const feature = data.features[0];
+        const placeName = feature.place_name;
+        
+        // Extract prefecture from the address components
+        const context = feature.context || [];
+        let prefecture = '';
+        let address = placeName;
+        
+        // Look for prefecture in context
+        for (const item of context) {
+          if (item.id && item.id.includes('region')) {
+            prefecture = item.text;
+            break;
+          }
         }
-      })
-      .on('mouseover', function(event, d) {
-        d3.select(this).attr('stroke-width', 2);
         
-        const stat = prefectureStats.find(s => s.prefecture === d.properties.name);
-        const tooltip = d3.select('body')
-          .append('div')
-          .attr('class', 'tooltip')
-          .style('position', 'absolute')
-          .style('background', 'rgba(0, 0, 0, 0.8)')
-          .style('color', 'white')
-          .style('padding', '8px')
-          .style('border-radius', '4px')
-          .style('font-size', '12px')
-          .style('pointer-events', 'none')
-          .style('z-index', '1000')
-          .html(`${d.properties.name}: ${stat ? stat.count : 0}件`);
+        // If no prefecture found in context, try to extract from place_name
+        if (!prefecture) {
+          const addressParts = placeName.split(',').map((part: string) => part.trim());
+          // Look for prefecture pattern (ends with 県, 府, 都, 道)
+          for (const part of addressParts) {
+            if (part.match(/(県|府|都|道)$/)) {
+              prefecture = part;
+              break;
+            }
+          }
+        }
         
-        tooltip
-          .style('left', (event.pageX + 10) + 'px')
-          .style('top', (event.pageY - 10) + 'px');
-      })
-      .on('mouseout', function() {
-        d3.select(this).attr('stroke-width', 1);
-        d3.selectAll('.tooltip').remove();
-      });
+        console.log('MapTiler: Reverse geocoding result:', { placeName, prefecture, address });
+        return { prefecture, address };
+      }
+    } catch (error) {
+      console.error('MapTiler: Reverse geocoding error:', error);
+    }
+    
+    return { prefecture: '不明', address: '住所不明' };
+  };
 
-    pins.forEach(pin => {
-      const coords = projection([pin.longitude, pin.latitude]);
-      if (coords) {
-        g.append('circle')
-          .attr('cx', coords[0])
-          .attr('cy', coords[1])
-          .attr('r', 6)
-          .attr('fill', '#ec4899')
-          .attr('stroke', 'white')
-          .attr('stroke-width', 2)
-          .style('cursor', 'pointer')
-          .on('click', () => onPinClick?.(pin))
-          .on('mouseover', function(event) {
-            d3.select(this).attr('r', 8);
-            
-            const tooltip = d3.select('body')
-              .append('div')
-              .attr('class', 'pin-tooltip')
-              .style('position', 'absolute')
-              .style('background', 'rgba(0, 0, 0, 0.9)')
-              .style('color', 'white')
-              .style('padding', '8px')
-              .style('border-radius', '4px')
-              .style('font-size', '12px')
-              .style('pointer-events', 'none')
-              .style('z-index', '1000')
-              .html(`
-                <div><strong>${pin.title}</strong></div>
-                <div>${pin.prefecture}</div>
-                ${pin.description ? `<div>${pin.description}</div>` : ''}
-              `);
-            
-            tooltip
-              .style('left', (event.pageX + 10) + 'px')
-              .style('top', (event.pageY - 10) + 'px');
-          })
-          .on('mouseout', function() {
-            d3.select(this).attr('r', 6);
-            d3.selectAll('.pin-tooltip').remove();
-          });
+  // Initialize map
+  useEffect(() => {
+    if (!mapContainer.current) return;
+
+    // Create map instance
+    map.current = new maplibregl.Map({
+      container: mapContainer.current,
+      style: {
+        version: 8,
+        sources: {
+          'raster-tiles': {
+            type: 'raster',
+            tiles: [
+              'https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=get_your_own_OpIi9ZULNHzrESv6T2vL'
+            ],
+            tileSize: 256,
+            attribution: '© MapTiler © OpenStreetMap contributors'
+          }
+        },
+        layers: [
+          {
+            id: 'simple-tiles',
+            type: 'raster',
+            source: 'raster-tiles',
+            minzoom: 0,
+            maxzoom: 22
+          }
+        ]
+      },
+      center: [138.2529, 36.2048], // Japan center
+      zoom: 5,
+      minZoom: 4,
+      maxZoom: 18
+    });
+
+    // Add navigation controls
+    map.current.addControl(new maplibregl.NavigationControl(), 'top-right');
+
+    map.current.on('load', () => {
+      console.log('MapTiler: Map loaded successfully');
+      setMapLoaded(true);
+    });
+
+    // Handle map clicks
+    map.current.on('click', async (e) => {
+      if (onMapClick) {
+        const { lng, lat } = e.lngLat;
+        console.log('MapTiler: Map clicked at', { lng, lat });
+        
+        // Get address information from coordinates
+        const { prefecture, address } = await reverseGeocode(lng, lat);
+        
+        // Call the callback with address info
+        onMapClick([lng, lat], prefecture, address);
       }
     });
 
-  }, [dimensions, pins, prefectureStats, onPinClick, onMapClick]);
+    return () => {
+      if (map.current) {
+        map.current.remove();
+      }
+    };
+  }, []);
+
+  // Handle onMapClick changes separately
+  useEffect(() => {
+    if (!map.current || !mapLoaded) return;
+
+    // Remove existing click handler
+    map.current.off('click');
+    
+    // Add new click handler
+    map.current.on('click', async (e) => {
+      if (onMapClick) {
+        const { lng, lat } = e.lngLat;
+        console.log('MapTiler: Map clicked at', { lng, lat });
+        
+        // Get address information from coordinates
+        const { prefecture, address } = await reverseGeocode(lng, lat);
+        
+        // Call the callback with address info
+        onMapClick([lng, lat], prefecture, address);
+      }
+    });
+  }, [onMapClick, mapLoaded]);
+
+  // Add pins to map
+  useEffect(() => {
+    if (!map.current || !mapLoaded) return;
+
+    // Clear existing pins
+    pins.forEach((_, index) => {
+      const markerId = `pin-${index}`;
+      const existingMarker = document.getElementById(markerId);
+      if (existingMarker) {
+        existingMarker.remove();
+      }
+    });
+
+    // Add new pins
+    pins.forEach((pin, index) => {
+      const marker = new maplibregl.Marker({
+        color: '#ec4899'
+      })
+        .setLngLat([pin.longitude, pin.latitude])
+        .setPopup(
+          new maplibregl.Popup({ offset: 25 }).setHTML(
+            `<div>
+              <h3 style="margin: 0 0 8px 0; font-weight: bold;">${pin.title}</h3>
+              <p style="margin: 0 0 4px 0; color: #666;">${pin.prefecture}</p>
+              ${pin.description ? `<p style="margin: 0; font-size: 14px;">${pin.description}</p>` : ''}
+            </div>`
+          )
+        )
+        .addTo(map.current!);
+
+      // Add click handler
+      marker.getElement().addEventListener('click', () => {
+        if (onPinClick) {
+          onPinClick(pin);
+        }
+      });
+
+      // Add ID for cleanup
+      marker.getElement().id = `pin-${index}`;
+    });
+
+    console.log('MapTiler: Added', pins.length, 'pins to map');
+  }, [pins, mapLoaded, onPinClick]);
+
+  const handleLocationSearch = (coordinates: [number, number], prefecture: string, address: string) => {
+    // Fly to the selected location
+    if (map.current) {
+      map.current.flyTo({
+        center: coordinates,
+        zoom: 14,
+        essential: true
+      });
+    }
+    
+    // Call the map click handler with the selected location
+    if (onMapClick) {
+      onMapClick(coordinates, prefecture, address);
+    }
+  };
 
   return (
     <div className="w-full">
-      <svg
-        ref={svgRef}
-        width={dimensions.width}
-        height={dimensions.height}
-        className="border border-gray-300 rounded-lg bg-blue-50"
+      <div className="mb-4">
+        <LocationSearch onLocationSelect={handleLocationSearch} />
+      </div>
+      
+      <div
+        ref={mapContainer}
+        className="w-full h-[600px] rounded-lg border border-gray-300"
+        style={{ minHeight: '400px' }}
       />
       
-      <div className="mt-4 flex items-center justify-between">
-        <div className="text-sm text-gray-600">
-          クリックして新しい場所を追加
+      <div className="mt-4 flex items-center justify-between bg-gradient-to-r from-honey-50 to-primary-50 p-4 rounded-xl border border-honey-200/50">
+        <div className="text-sm text-warm-700 font-medium flex items-center">
+          ✨ 検索または地図をクリックして新しい場所を追加
         </div>
         
-        <div className="flex items-center space-x-2">
-          <span className="text-xs text-gray-500">訪問回数:</span>
-          <div className="flex items-center space-x-1">
-            <div className="w-4 h-4" style={{ backgroundColor: '#fce7f3' }}></div>
-            <span className="text-xs">少</span>
+        <div className="flex items-center space-x-6">
+          <div className="text-xs text-warm-600 font-medium flex items-center space-x-1">
+            <span>📍 ピン数:</span>
+            <span className="bg-primary-200 px-2 py-1 rounded-full text-primary-800">{pins.length}</span>
           </div>
-          <div className="flex items-center space-x-1">
-            <div className="w-4 h-4" style={{ backgroundColor: '#be185d' }}></div>
-            <span className="text-xs">多</span>
-          </div>
+          
+          {prefectureStats.length > 0 && (
+            <div className="flex items-center space-x-2">
+              <span className="text-xs text-warm-600 font-medium">🗾 都道府県:</span>
+              <span className="text-xs font-semibold bg-maple-200 px-2 py-1 rounded-full text-maple-800">{prefectureStats.length}</span>
+            </div>
+          )}
         </div>
       </div>
     </div>

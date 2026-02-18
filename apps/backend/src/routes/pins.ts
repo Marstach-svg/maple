@@ -6,13 +6,27 @@ import { prisma } from '../utils/database';
 
 export const pinRoutes = new Hono();
 
-pinRoutes.post('/', requireAuth, zValidator('json', createPinSchema), async (c) => {
+pinRoutes.post('/', requireAuth, async (c) => {
   try {
-    const pinData = c.req.valid('json');
+    // Manual validation to get detailed error
+    const rawData = await c.req.json();
+    console.log('PIN CREATE: Raw request data:', JSON.stringify(rawData, null, 2));
+    
+    const validation = createPinSchema.safeParse(rawData);
+    if (!validation.success) {
+      console.log('PIN CREATE: Validation failed:', validation.error.errors);
+      const response: ApiResponse = {
+        success: false,
+        error: 'データ検証エラー: ' + validation.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', '),
+      };
+      return c.json(response, 400);
+    }
+    
+    const pinData = validation.data;
     const user = c.get('user');
     const groupId = c.req.header('X-Group-Id');
     
-    console.log('PIN CREATE: pinData:', pinData);
+    console.log('PIN CREATE: pinData:', JSON.stringify(pinData, null, 2));
     console.log('PIN CREATE: user:', user);
     console.log('PIN CREATE: groupId:', groupId);
   
