@@ -20,19 +20,6 @@ export default function Header() {
 
   return (
     <header className="bg-gradient-to-r from-maple-500 via-primary-500 to-honey-500 shadow-lg border-b-2 border-honey-300/50 relative overflow-hidden">
-      {/* Falling leaves animation */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute animate-bounce text-maple-200 opacity-30" style={{ left: '5%', animationDelay: '0s', animationDuration: '3s' }}>🍁</div>
-        <div className="absolute animate-bounce text-honey-200 opacity-40" style={{ left: '15%', animationDelay: '1s', animationDuration: '4s' }}>🍂</div>
-        <div className="absolute animate-bounce text-maple-300 opacity-35" style={{ left: '25%', animationDelay: '2s', animationDuration: '3.5s' }}>🍁</div>
-        <div className="absolute animate-bounce text-primary-200 opacity-30" style={{ left: '35%', animationDelay: '0.5s', animationDuration: '4.5s' }}>🍂</div>
-        <div className="absolute animate-bounce text-honey-300 opacity-40" style={{ left: '45%', animationDelay: '1.5s', animationDuration: '3s' }}>🍁</div>
-        <div className="absolute animate-bounce text-maple-200 opacity-25" style={{ left: '55%', animationDelay: '2.5s', animationDuration: '4s' }}>🍂</div>
-        <div className="absolute animate-bounce text-primary-300 opacity-35" style={{ left: '65%', animationDelay: '0.8s', animationDuration: '3.5s' }}>🍁</div>
-        <div className="absolute animate-bounce text-honey-200 opacity-30" style={{ left: '75%', animationDelay: '1.8s', animationDuration: '4.5s' }}>🍂</div>
-        <div className="absolute animate-bounce text-maple-300 opacity-40" style={{ left: '85%', animationDelay: '3s', animationDuration: '3s' }}>🍁</div>
-        <div className="absolute animate-bounce text-primary-200 opacity-25" style={{ left: '95%', animationDelay: '2.2s', animationDuration: '4s' }}>🍂</div>
-      </div>
 
       <div className="container mx-auto px-4 py-4 relative z-10">
         <div className="flex items-center justify-between">
@@ -50,14 +37,12 @@ export default function Header() {
               href="/app" 
               className="text-white hover:text-honey-100 font-medium transition-all duration-200 hover:scale-105 flex items-center space-x-1"
             >
-              <span>🗺️</span>
               <span>地図</span>
             </a>
             <a 
               href="/app/groups" 
               className="text-white hover:text-honey-100 font-medium transition-all duration-200 hover:scale-105 flex items-center space-x-1"
             >
-              <span>👥</span>
               <span>グループ</span>
             </a>
             

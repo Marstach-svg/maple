@@ -225,18 +225,18 @@ export default function JapanMap({ pins, prefectureStats, onPinClick, onMapClick
       
       <div className="mt-4 flex items-center justify-between bg-gradient-to-r from-honey-50 to-primary-50 p-4 rounded-xl border border-honey-200/50">
         <div className="text-sm text-warm-700 font-medium flex items-center">
-          ✨ 検索または地図をクリックして新しい場所を追加
+          検索または地図をクリックして新しい場所を追加
         </div>
         
         <div className="flex items-center space-x-6">
           <div className="text-xs text-warm-600 font-medium flex items-center space-x-1">
-            <span>📍 ピン数:</span>
+            <span>ピン数:</span>
             <span className="bg-primary-200 px-2 py-1 rounded-full text-primary-800">{pins.length}</span>
           </div>
           
           {prefectureStats.length > 0 && (
             <div className="flex items-center space-x-2">
-              <span className="text-xs text-warm-600 font-medium">🗾 都道府県:</span>
+              <span className="text-xs text-warm-600 font-medium">都道府県:</span>
               <span className="text-xs font-semibold bg-maple-200 px-2 py-1 rounded-full text-maple-800">{prefectureStats.length}</span>
             </div>
           )}

@@ -49,7 +49,7 @@ export default function LoginPage() {
               Maple
             </h2>
             <p className="mt-2 text-warm-600 font-medium">
-              {isRegisterMode ? '✨ アカウントを作成' : '🚪 アカウントにログイン'}
+              {isRegisterMode ? 'アカウントを作成' : 'アカウントにログイン'}
             </p>
           </div>
           
@@ -57,7 +57,7 @@ export default function LoginPage() {
             <div className="space-y-4">
               <div>
                 <label htmlFor="email" className="block text-sm font-semibold text-warm-800 mb-2">
-                  📧 メールアドレス
+                  メールアドレス
                 </label>
                 <input
                   id="email"
@@ -74,7 +74,7 @@ export default function LoginPage() {
               {isRegisterMode && (
                 <div>
                   <label htmlFor="name" className="block text-sm font-semibold text-warm-800 mb-2">
-                    👤 名前（任意）
+                    名前（任意）
                   </label>
                   <input
                     id="name"
@@ -90,7 +90,7 @@ export default function LoginPage() {
               
               <div>
                 <label htmlFor="password" className="block text-sm font-semibold text-warm-800 mb-2">
-                  🔒 パスワード
+                  パスワード
                 </label>
                 <input
                   id="password"
@@ -107,7 +107,7 @@ export default function LoginPage() {
             
             {error && (
               <div className="bg-red-50 border-2 border-red-200 rounded-xl p-3 text-red-700 text-sm font-medium text-center">
-                ❌ {error}
+                {error}
               </div>
             )}
             
@@ -116,7 +116,7 @@ export default function LoginPage() {
               disabled={isLoading}
               className="w-full bg-gradient-to-r from-primary-500 to-honey-500 hover:from-primary-600 hover:to-honey-600 text-white py-3 px-6 rounded-xl font-semibold disabled:opacity-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:hover:transform-none"
             >
-              {isLoading ? '💫 処理中...' : isRegisterMode ? '🌟 登録' : '🚀 ログイン'}
+              {isLoading ? '処理中...' : isRegisterMode ? '登録' : 'ログイン'}
             </button>
             
             <div className="text-center">
@@ -128,7 +128,7 @@ export default function LoginPage() {
                 }}
                 className="text-primary-600 hover:text-primary-700 font-medium transition-all duration-200 hover:bg-primary-100 px-4 py-2 rounded-lg"
               >
-                {isRegisterMode ? '🔙 ログインに戻る' : '✨ 新規登録'}
+                {isRegisterMode ? 'ログインに戻る' : '新規登録'}
               </button>
             </div>
           </form>

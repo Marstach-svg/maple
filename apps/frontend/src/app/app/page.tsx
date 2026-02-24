@@ -124,7 +124,7 @@ export default function AppPage() {
         <div className="flex items-center justify-center min-h-[80vh]">
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-honey-200/50 p-12 text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-honey-500 mx-auto mb-4"></div>
-            <p className="text-warm-700 font-semibold">🍯 読み込み中...</p>
+            <p className="text-warm-700 font-semibold">読み込み中...</p>
           </div>
         </div>
       </AppLayout>
@@ -147,7 +147,7 @@ export default function AppPage() {
               href="/app/groups"
               className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary-500 to-honey-500 hover:from-primary-600 hover:to-honey-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"
             >
-              🚀 グループ管理へ
+              グループ管理へ
             </a>
           </div>
         </div>
@@ -163,7 +163,6 @@ export default function AppPage() {
             <div className="flex items-center space-x-4">
               {selectedGroup && (
                 <div className="flex items-center space-x-3">
-                  <div className="text-2xl">👥</div>
                   <p className="text-xl font-bold text-warm-800">{selectedGroup.name}</p>
                 </div>
               )}
@@ -223,14 +222,14 @@ export default function AppPage() {
                   onClick={handleDeletePin}
                   className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-3 px-4 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                 >
-                  🗑️ ピンを削除
+                  ピンを削除
                 </button>
               </div>
             )}
 
             <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-honey-200/50 p-6">
               <h3 className="text-xl font-bold text-warm-800 mb-4 flex items-center">
-                📊 訪問統計
+                訪問統計
               </h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-center bg-gradient-to-r from-honey-50 to-primary-50 p-3 rounded-xl">
@@ -246,7 +245,7 @@ export default function AppPage() {
               {prefectureStats.length > 0 && (
                 <div className="mt-6">
                   <h4 className="text-lg font-semibold text-warm-800 mb-3 flex items-center">
-                    🍂 都道府県別
+                    都道府県別
                   </h4>
                   <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
                     {prefectureStats

@@ -85,13 +85,13 @@ export default function PinForm({
   return (
     <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-honey-200/50 p-6">
       <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-primary-600 to-maple-500 bg-clip-text text-transparent flex items-center">
-        {isEdit ? '✏️ ピンを編集' : '📍 新しいピンを追加'}
+        {isEdit ? 'ピンを編集' : '新しいピンを追加'}
       </h2>
       
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label htmlFor="title" className="block text-sm font-semibold text-warm-800 mb-2">
-            ✨ タイトル *
+            タイトル *
           </label>
           <input
             id="title"
@@ -107,7 +107,7 @@ export default function PinForm({
 
         <div>
           <label htmlFor="description" className="block text-sm font-semibold text-warm-800 mb-2">
-            📝 説明
+            説明
           </label>
           <textarea
             id="description"
@@ -126,7 +126,7 @@ export default function PinForm({
 
         <div>
           <label htmlFor="prefecture" className="block text-sm font-semibold text-warm-800 mb-2">
-            🗾 都道府県 *
+            都道府県 *
           </label>
           <select
             id="prefecture"
@@ -147,7 +147,7 @@ export default function PinForm({
 
         <div>
           <label htmlFor="address" className="block text-sm font-semibold text-warm-800 mb-2">
-            📍 住所
+            住所
           </label>
           <input
             id="address"
@@ -162,7 +162,7 @@ export default function PinForm({
 
         <div>
           <label htmlFor="visitedAt" className="block text-sm font-semibold text-warm-800 mb-2">
-            📅 訪問日
+            訪問日
           </label>
           <input
             id="visitedAt"
@@ -180,14 +180,14 @@ export default function PinForm({
             disabled={isLoading}
             className="flex-1 bg-gradient-to-r from-primary-500 to-honey-500 hover:from-primary-600 hover:to-honey-600 text-white py-3 px-6 rounded-xl font-semibold disabled:opacity-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:hover:transform-none"
           >
-            {isLoading ? '💫 保存中...' : isEdit ? '✅ 更新' : '🌟 追加'}
+            {isLoading ? '保存中...' : isEdit ? '更新' : '追加'}
           </button>
           <button
             type="button"
             onClick={onCancel}
             className="flex-1 bg-gradient-to-r from-warm-300 to-warm-400 hover:from-warm-400 hover:to-warm-500 text-warm-800 py-3 px-6 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
           >
-            ❌ キャンセル
+            キャンセル
           </button>
         </div>
       </form>

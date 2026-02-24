@@ -107,7 +107,7 @@ export default function LocationSearch({ onLocationSelect }: LocationSearchProps
           type="text"
           value={query}
           onChange={handleInputChange}
-          placeholder="🔍 場所を検索（例：東京駅、渋谷区、沖縄県）"
+          placeholder="場所を検索（例：東京駅、渋谷区、沖縄県）"
           className="w-full px-4 py-3 pl-12 bg-gradient-to-r from-honey-50 to-primary-50 border-2 border-honey-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400 transition-all duration-200 text-warm-800 font-medium placeholder-warm-500"
         />
         <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
@@ -130,10 +130,10 @@ export default function LocationSearch({ onLocationSelect }: LocationSearchProps
               className="px-4 py-3 hover:bg-gradient-to-r hover:from-honey-50 hover:to-primary-50 cursor-pointer border-b border-honey-100 last:border-b-0 transition-all duration-150"
             >
               <div className="text-sm font-semibold text-warm-800 truncate flex items-center">
-                📍 {result.place_name}
+                {result.place_name}
               </div>
               <div className="text-xs text-warm-600 flex items-center mt-1">
-                🗾 {result.prefecture}
+                {result.prefecture}
               </div>
             </div>
           ))}
@@ -143,7 +143,7 @@ export default function LocationSearch({ onLocationSelect }: LocationSearchProps
       {showResults && results.length === 0 && query.length >= 2 && !isSearching && (
         <div className="absolute z-50 w-full mt-2 bg-white/95 backdrop-blur-sm border-2 border-honey-200 rounded-xl shadow-xl">
           <div className="px-4 py-3 text-sm text-warm-600 flex items-center">
-            😔 検索結果が見つかりませんでした
+            検索結果が見つかりませんでした
           </div>
         </div>
       )}
